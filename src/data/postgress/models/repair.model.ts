@@ -7,7 +7,6 @@ export enum RepairStatus {
   CANCELLED = "CANCELLED"
 }
 
-
 @Entity()
 export class Repair extends BaseEntity {
   //ID
@@ -19,6 +18,20 @@ export class Repair extends BaseEntity {
     nullable: false,
   })
   date: Date;
+
+  //MOTORSNUMBER
+  @Column("varchar", {
+    nullable: false,
+    default:""
+  })
+  motorsNumber: string;
+  
+  //DESCRIPTION
+  @Column("text", {
+    nullable: false,
+    default:""
+  })
+  description: string;
 
   //STATUS
   @Column("enum", {

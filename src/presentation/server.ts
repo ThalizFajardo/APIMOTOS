@@ -20,7 +20,7 @@ export class Server {
     this.app.use(this.routes);
 
     this.app.listen(this.port, () => {
-      console.log(`🚀 Servidor corriendo en 🌐 http://localhost:${this.port} 😊🎉`);
+      console.log(`🚀 Server running on 🌐 http://localhost:${this.port} 😊🎉`);
     });
   }
 }

@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { UserService } from "../services/user.service";
-import { CreateUserDTO } from "../../domain";
-import { UpdateUserDTO } from "../../domain/dtos/updateUser.dto";
+import { RegisterUserDTO } from "../../domain/dtos/users/registerUser.dto";
+import { UpdateUserDTO } from "../../domain/dtos/users/updateUser.dto";
+import { LoginUserDto } from "../../domain/dtos/users/loginUser.dto";
 import { CustomError } from "../../domain";
+import { error } from "console";
 
 export class UserController {
   constructor(private readonly userService: UserService) { }
@@ -17,16 +19,54 @@ export class UserController {
     return res.status(500).json({ message: "Something went very wrong! 🧨" });
   };
 
+  login = (req: Request, res: Response) => {
+    const [error, loginUserDto] = LoginUserDto.create(req.body);
 
+    if (error) return res.status(422).json({ message: error });
 
-
-  findAllUser = (req: Request, res: Response) => {
     this.userService
-      .findAll()
-      .then((data) => res.status(201).json(data))
-      .catch((error: any) => { this.handleError(error, res) });
+    .login(loginUserDto!)
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
+  }
+
+  register = (req: Request, res: Response) => {
+    const [error, registerUserDto] = RegisterUserDTO.create(req.body);
+
+    if (error) return res.status(422).json({ message: error });
+
+    this.userService
+      .register(registerUserDto!)
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
   };
 
+  validateAccount = (req: Request, res: Response) => {
+    const { token } = req.params;
+
+    this.userService
+      .validateEmail(token)
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
+  };
+
+  getProfile = (req: Request, res: Response) => {
+    this.userService
+      .getUserProfile(req.body.sessionUser)
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
+
+  }
+
+  blockAccount = (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    this.userService
+      .blockAccount(id)
+      .then((data) => res.status(200).json(data))
+      .catch((error) => this.handleError(error, res));
+
+  }
 
   findOneUser = (req: Request, res: Response) => {
     const { id } = req.params;
@@ -37,18 +77,24 @@ export class UserController {
       .catch((error: any) => this.handleError(error, res))
   };
 
-  createUser = (req: Request, res: Response) => {
-    const [error, createUserDTO] = CreateUserDTO.create(req.body);
-
-    if (error) return res.status(422).json({ message: error });
-
+  findAllUser = (req: Request, res: Response) => {
     this.userService
-      .create(createUserDTO!)
+      .findAll()
       .then((data) => res.status(201).json(data))
       .catch((error: any) => { this.handleError(error, res) });
-  }
+  };
 
 
+  // createUser = (req: Request, res: Response) => {
+  //   const [error, createUserDTO] = CreateUserDTO.create(req.body);
+
+  //   if (error) return res.status(422).json({ message: error });
+
+  //   this.userService
+  //     .create(createUserDTO!)
+  //     .then((data) => res.status(201).json(data))
+  //     .catch((error: any) => { this.handleError(error, res) });
+  // }
 
   updateUser = (req: Request, res: Response) => {
     const { id } = req.params;

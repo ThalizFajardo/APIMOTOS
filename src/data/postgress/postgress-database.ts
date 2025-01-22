@@ -33,18 +33,18 @@ export class PostgresDatabase {
     async connect() {
         try {
             await this.datasource.initialize()
-            console.log("🎉✨ La base de datos se ha conectado exitosamente: ¡Todo está listo para comenzar! 🌟😀")
+            console.log("🎉✨ The database has been successfully connected: Everything is ready to go! 🌟😀")
         } catch (error) {
             console.log(error)
         }
     }
 }
 
-// Exportar una instancia global si no hacia esto me daba error
-export const AppDatabase = new PostgresDatabase({
-    host: process.env.DB_HOST || "localhost",
-    port: parseInt(process.env.DB_PORT || "5432", 10),
-    username: process.env.DB_USERNAME || "postgres",
-    password: process.env.DB_PASSWORD || "password",
-    database: process.env.DB_DATABASE || "testdb",
-  });
+// // Exportar una instancia global si no hacia esto me daba error
+// export const AppDatabase = new PostgresDatabase({
+//     host: process.env.DB_HOST || "localhost",
+//     port: parseInt(process.env.DB_PORT || "5432", 10),
+//     username: process.env.DB_USERNAME || "postgres",
+//     password: process.env.DB_PASSWORD || "password",
+//     database: process.env.DB_DATABASE || "testdb",
+//   });

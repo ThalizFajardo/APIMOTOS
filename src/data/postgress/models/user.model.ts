@@ -1,15 +1,17 @@
-
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   Entity,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { encriptAdapter } from "../../../config";
 
 
 export enum Status {
   AVALIABLE = "AVALIABLE",
   DISABLED = "DISABLED",
+  BLOCKED = "BLOCKED"
 }
 
 export enum Role {
@@ -17,40 +19,39 @@ export enum Role {
   CLIENT = "CLIENT",
 }
 
-
 @Entity()
 export class User extends BaseEntity {
   //ID
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
- //NOMBRE 
+ 
+  //NOMBRE 
   @Column("varchar", {
     length: 80,
     nullable: false,
   })
   name: string;
-
-//EMAIL
+  
+  //EMAIL
   @Column("varchar", {
     length: 80,
     nullable: false,
     unique: true,
   })
   email: string;
-
+  
   //PASSWORD
   @Column("varchar", {
     nullable: false,
   })
   password: string;
-
-//ROLE
-  @Column( "enum",{
+  
+  //ROLE
+  @Column("enum", {
     enum: Role,
-    default:Role.CLIENT, 
+    default: Role.CLIENT,
   })
-  role : Role;
+  role: Role;
 
   //STATUS
   @Column("enum", {
@@ -59,4 +60,9 @@ export class User extends BaseEntity {
   })
   status: Status;
 
+  //ok antes de que llegue la contraseña la encriptamos...
+  @BeforeInsert()
+  encryptedPassword() {
+    this.password = encriptAdapter.hash(this.password)
+  }
 }
