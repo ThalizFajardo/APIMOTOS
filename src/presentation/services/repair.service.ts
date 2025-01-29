@@ -1,6 +1,8 @@
+import { User } from "../../data";
 import { Repair, RepairStatus } from "../../data/postgress/models/repair.model";
 import { CreateRepairDTO } from "../../domain";
 import { CustomError } from "../../domain";
+import { In } from "typeorm";
 
 export class RepairService {
 
@@ -8,8 +10,19 @@ export class RepairService {
     try {
       return await Repair.find({
         where: {
-          status: RepairStatus.PENDING,
-        }
+          status: In([RepairStatus.PENDING, RepairStatus.COMPLETED]),
+        },
+        relations: {
+          user: true,
+        },
+        select: {
+        user:{
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+        },    
+        },
       });
     } catch (error) {
       throw CustomError.internalServer("⚠️ There was an error fetching the repairs:");
@@ -35,7 +48,8 @@ export class RepairService {
       where: {
         status: RepairStatus.PENDING,
         id: id,
-      }
+      },
+
     });
     if (!repair) {
       throw CustomError.notFoud(`🔍 Repair with ID ${id} not found 🚫`);

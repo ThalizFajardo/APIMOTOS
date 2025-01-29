@@ -5,6 +5,9 @@ import { UpdateUserDTO } from "../../domain/dtos/users/updateUser.dto";
 import { LoginUserDto } from "../../domain/dtos/users/loginUser.dto";
 import { CustomError } from "../../domain";
 import { error } from "console";
+import { protectAccountOwner } from "../../config/validateOwner";
+
+
 
 export class UserController {
   constructor(private readonly userService: UserService) { }
@@ -99,6 +102,11 @@ export class UserController {
   updateUser = (req: Request, res: Response) => {
     const { id } = req.params;
     const [error, updateUserDTO] = UpdateUserDTO.create(req.body);
+    const sessionUserId = req.body.sessionUser.id;
+
+    if (!protectAccountOwner(id, sessionUserId)) {
+      return res.status(401).json({ message: "You are not the owner of this account"});
+    }
 
     if (error) return res.status(422).json({ message: error });
     this.userService
@@ -112,9 +120,14 @@ export class UserController {
   deleteUser = (req: Request, res: Response) => {
     const { id } = req.params;
     const [error, updateUserDTO] = UpdateUserDTO.create(req.body);
+    const sessionUserId = req.body.sessionUserId.id;
+
+    if (!protectAccountOwner(id, sessionUserId)) {
+      return res.status(401).json({ message: "You are not the owner of this account" });
+    }
 
     this.userService
-      .delete(id,updateUserDTO!)
+      .delete(id, updateUserDTO!)
       .then((data) => res.status(204).json(data))
       .catch((error: any) => this.handleError(error, res))
   }
